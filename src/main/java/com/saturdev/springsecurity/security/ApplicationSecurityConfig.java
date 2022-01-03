@@ -1,8 +1,11 @@
 package com.saturdev.springsecurity.security;
 
+import static com.saturdev.springsecurity.security.ApplicationUserPermission.*;
+import static com.saturdev.springsecurity.security.ApplicationUserRole.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -29,8 +32,11 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
-                .antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
-                
+                .antMatchers("/api/**").hasRole(STUDENT.name())
+                .antMatchers(HttpMethod.DELETE,"management/api/**").hasAuthority(COURSES_WRITE.name())
+                .antMatchers(HttpMethod.POST,"management/api/**").hasAuthority(COURSES_WRITE.name())
+                .antMatchers(HttpMethod.PUT,"management/api/**").hasAuthority(COURSES_WRITE.name())
+                .antMatchers(HttpMethod.GET,"management/api/**").hasAnyRole(ADMIN.name(), ADMIN_TRAINEE.name())
                 .anyRequest()
                 .authenticated()
                 .and()
