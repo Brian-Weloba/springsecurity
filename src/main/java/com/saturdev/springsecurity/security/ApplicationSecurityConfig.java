@@ -16,20 +16,21 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final PasswordEncoder  passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder){
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
 
-    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/","index","/css/*","/js/*").permitAll()
+                .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
                 .antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
+                
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -39,20 +40,27 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @Bean
     protected UserDetailsService userDetailsService() {
-      UserDetails peterparker = User.builder()
-        .username("peterparker")
-        .password(passwordEncoder.encode("password"))
-        .roles(ApplicationUserRole.STUDENT.name())
-        .build();
+        UserDetails peterparker = User.builder()
+                .username("peterparker")
+                .password(passwordEncoder.encode("password"))
+                .roles(ApplicationUserRole.STUDENT.name())
+                .build();
 
         UserDetails james = User.builder()
-        .username("james")
-        .password(passwordEncoder.encode("password"))
-        .roles(ApplicationUserRole.ADMIN.name())
-        .build();
+                .username("james")
+                .password(passwordEncoder.encode("password"))
+                .roles(ApplicationUserRole.ADMIN.name())
+                .build();
+
+        UserDetails tom = User.builder()
+                .username("tom")
+                .password(passwordEncoder.encode("password"))
+                .roles(ApplicationUserRole.ADMIN_TRAINEE.name())
+                .build();
 
         return new InMemoryUserDetailsManager(
-            peterparker,
-            james);
+                peterparker,
+                james,
+                tom);
     }
 }
